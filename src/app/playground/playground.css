@@ -1,0 +1,83 @@
+theme-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.theme-suggestions {
+    list-style-type: none;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    max-width: 400px;
+    text-align: left;
+    margin-top: 5px;
+}
+
+.theme-suggestions li {
+    padding: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.theme-suggestions li:hover {
+    background: #f0f0f0;
+}
+
+.predict-button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.predict-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Spacing between Select Themes and Enter Keywords */
+.keywords {
+    margin-top: 20px; /* Adds space between theme selection and keywords */
+}
+
+/* Outlined theme selection boxes */
+.selected-themes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px; /* Space between selected themes */
+    margin-top: 10px;
+}
+
+.theme-tag {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid #42a5f5; /* Blue outline */
+    color: #42a5f5;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: default;
+}
+
+.theme-tag button {
+    background: none;
+    border: none;
+    color: #42a5f5;
+    font-weight: bold;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.theme-tag button:hover {
+    color: red; /* X turns red when hovered */
+}

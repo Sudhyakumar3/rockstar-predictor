@@ -1,166 +1,184 @@
 "use client";
 
 import { useState, ChangeEvent, MouseEvent } from "react";
-import "./playground.css"; // Import styles
+import { WavyBackground } from "@/components/ui/wavy-background";
+import { Navbar } from "@/components/ui/Navbar";
 
-interface ThemePopularity {
-    name: string;
-    count: number;
-}
+const Playground = () => {
+  const [themeInput, setThemeInput] = useState<string>("");
+  const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
+  const [filteredThemes, setFilteredThemes] = useState<string[]>([]);
+  const [keywords, setKeywords] = useState<string>("");
+  const [tempo, setTempo] = useState<number>(120);
+  const [popularityScore, setPopularityScore] = useState<number | null>(null);
 
-const Playground: React.FC = () => {
-    const [themeInput, setThemeInput] = useState<string>("");
-    const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
-    const [filteredThemes, setFilteredThemes] = useState<string[]>([]);
-    const [showPopularThemes, setShowPopularThemes] = useState<boolean>(false);
-    const [keywords, setKeywords] = useState<string>("");
-    const [tempo, setTempo] = useState<number>(120);
-    const [popularityScore, setPopularityScore] = useState<number | null>(null);
+  // Adjust wave properties dynamically
+  const waveFrequency = Math.max(3, (tempo - 60) / 6); // More waves at higher BPM
+  const waveAmplitude = Math.max(1, (tempo - 60) / 10); // Taller waves at higher BPM
+  const waveSpeed = Math.max(0.3, (200 - tempo) / 50); // Faster at higher BPM
 
-    // Full theme list
-    const allThemes: string[] = [
-        "power", "disillusionment", "toxic relationship", "intimacy", "pride", "murder", "trauma", "darkness", 
-        "family", "regret", "responsibility", "hedonism", "violence", "travel", "grief", "sex", "love", 
-        "observation", "indulgence", "relationships", "confusion", "doubt", "hustle", "drama", "outcasts", 
-        "whiskey", "holiday", "deception", "isolation", "empowerment", "trust", "pain", "goodness", "opposition", 
-        "lifestyle", "celebration", "party", "self-empowerment", "vengeance", "mistrust", "carelessness", "excess", 
-        "abandonment", "flirtation", "solidarity", "dislike", "confidence", "poverty", "christmas", "protection", 
-        "manipulation", "obsession", "ambition", "guilt", "streetlife", "attraction", "resilience", "loathing", 
-        "forever", "joy", "sadness", "hate", "denial", "loyalty", "respect", "desire", "movingon", "liberation", 
-        "freedom", "vulnerability", "money", "anxiety", "loss", "summer", "popularity", "pleasure", "friendship", 
-        "happiness", "criticism", "swagger", "commitment", "seduction", "diss", "romance", "schadenfreude", 
-        "materialism", "affection", "drugs", "heartbreak", "uncertainty", "fear", "acceptance", "swag", "nostalgia", 
-        "fame", "misogyny", "cheating", "drinking", "betrayal", "longing", "infidelity", "jealousy", "devotion", 
-        "roots", "winter", "concern", "evil", "detachment", "mortality", "appreciation", "lies", "success", 
-        "insecurity", "struggle", "selfblame", "mockery", "anger", "gang", "arrogance", "fun", "selflove", 
-        "perseverance", "wealth", "paranoia", "frustration", "gratitude", "authenticity", "makeover", "desperation", 
-        "motivation", "dance", "loneliness", "toughness", "apathy", "blame", "rebellion", "selfdiscovery", 
-        "innocence", "spirituality", "independence", "youth", "danger", "addiction", "apology", "revenge", 
-        "identity", "possession", "cheer", "sarcasm", "lust", "aggression", "toxic love", "forgiveness", 
-        "disappointment", "crime", "toxicity"
-    ];
+  // Theme Selection
+  const allThemes: string[] = [
+    "power", "love", "freedom", "heartbreak", "party", "motivation", "confidence",
+    "revenge", "fear", "betrayal", "romance", "happiness", "loneliness", "success",
+  ];
 
-    // Popular themes list
-    const themePopularity: ThemePopularity[] = [
-        { name: "love", count: 135 }, { name: "heartbreak", count: 102 }, { name: "sadness", count: 57 },
-        { name: "party", count: 47 }, { name: "motivation", count: 39 }, { name: "wealth", count: 29 },
-        { name: "christmas", count: 21 }, { name: "freedom", count: 18 }, { name: "confidence", count: 15 },
-        { name: "empowerment", count: 15 }, { name: "friendship", count: 14 }, { name: "desire", count: 14 },
-    ];
+  const handleThemeInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value.toLowerCase();
+    setThemeInput(input);
+    if (input.length > 0) {
+      setFilteredThemes(allThemes.filter((theme) => theme.includes(input)).slice(0, 5));
+    } else {
+      setFilteredThemes([]);
+    }
+  };
 
-    // Show popular themes when input is clicked
-    const handleInputFocus = () => {
-        if (!themeInput) {
-            setFilteredThemes(themePopularity.map(t => t.name)); // Show only theme names
-            setShowPopularThemes(true);
-        }
-    };
+  const selectTheme = (theme: string) => {
+    if (selectedThemes.length < 3 && !selectedThemes.includes(theme)) {
+      setSelectedThemes([...selectedThemes, theme]);
+    }
+    setThemeInput("");
+    setFilteredThemes([]);
+  };
 
-    // Update suggestions based on user input
-    const handleThemeInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const input = e.target.value.toLowerCase();
-        setThemeInput(input);
-        setShowPopularThemes(false);
+  const removeTheme = (theme: string) => {
+    setSelectedThemes(selectedThemes.filter((t) => t !== theme));
+  };
 
-        if (input.length > 0) {
-            const matches = allThemes
-                .filter(theme => theme.includes(input))
-                .slice(0, 5); // Show top 5 matches
-            setFilteredThemes(matches);
-        } else {
-            setFilteredThemes([]);
-        }
-    };
+  const handleSubmit = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const fakeScore = Math.floor(Math.random() * 100);
+    setPopularityScore(fakeScore);
+  };
 
-    // Add selected theme (limit 3)
-    const selectTheme = (theme: string) => {
-        if (selectedThemes.length < 3 && !selectedThemes.includes(theme)) {
-            setSelectedThemes([...selectedThemes, theme]);
-        }
-        setThemeInput(""); // Clear input
-        setFilteredThemes([]); // Hide suggestions
-    };
+  return (
+    <div className="relative flex flex-col items-center min-h-screen bg-gray-900 text-white px-4">
+      <Navbar />
+      <WavyBackground />
 
-    // Remove selected theme
-    const removeTheme = (theme: string) => {
-        setSelectedThemes(selectedThemes.filter(t => t !== theme));
-    };
+      <div className="relative z-10 mt-24 w-full max-w-3xl">
+        <h1 className="text-5xl font-bold text-center">Song Popularity Playground 🎵</h1>
+        <p className="text-lg text-gray-300 text-center mt-2">
+          Experiment with themes, keywords, and tempo to see if your song is a hit!
+        </p>
 
-    // Handle form submission
-    const handleSubmit = (e: MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        const fakeScore = Math.floor(Math.random() * 100);
-        setPopularityScore(fakeScore);
-    };
+        {/* Theme Selection */}
+        <div className="bg-gray-800 p-6 mt-6 rounded-lg shadow-md w-full">
+          <h2 className="text-xl font-semibold">Select Up to 3 Themes</h2>
+          <input
+            type="text"
+            placeholder="Type a theme..."
+            value={themeInput}
+            onChange={handleThemeInputChange}
+            className="mt-2 w-full p-2 text-black rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500"
+          />
+          {filteredThemes.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {filteredThemes.map((theme, index) => (
+                <button
+                  key={index}
+                  className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition"
+                  onClick={() => selectTheme(theme)}
+                >
+                  {theme}
+                </button>
+              ))}
+            </div>
+          )}
 
-    return (
-        <div className="playground">
-            <h1>Song Popularity Playground</h1>
-            <p>Experiment with themes, keywords, and tempo to see if your song is a hit!</p>
+          {/* Selected Themes */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {selectedThemes.map((theme, index) => (
+              <span key={index} className="bg-blue-500 text-white px-3 py-1 rounded-md">
+                {theme}{" "}
+                <button className="ml-1 text-white" onClick={() => removeTheme(theme)}>
+                  ✕
+                </button>
+              </span>
+            ))}
+          </div>
+        </div>
 
-            <div className="controls">
-                <div className="themes">
-                    <h2>Select Up to 3 Themes</h2>
-                    <input
-                        type="text"
-                        value={themeInput}
-                        onChange={handleThemeInputChange}
-                        onFocus={handleInputFocus}
-                        placeholder="Type a theme..."
-                        className="theme-input"
-                    />
-                    {filteredThemes.length > 0 && (
-                        <ul className="theme-suggestions">
-                            {filteredThemes.map((theme, index) => (
-                                <li key={index} onClick={() => selectTheme(theme)}>
-                                    {theme}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                    <div className="selected-themes">
-                        {selectedThemes.map((theme, index) => (
-                            <span key={index} className="theme-tag">
-                                {theme} <button onClick={() => removeTheme(theme)}>x</button>
-                            </span>
-                        ))}
-                    </div>
-                </div>
+        {/* Keywords Input */}
+        <div className="bg-gray-800 p-6 mt-4 rounded-lg shadow-md w-full">
+          <h2 className="text-xl font-semibold">Enter Keywords</h2>
+          <input
+            type="text"
+            placeholder="Type some keywords..."
+            value={keywords}
+            onChange={(e) => setKeywords(e.target.value)}
+            className="mt-2 w-full p-2 text-black rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-                <div className="keywords">
-                    <h2>Enter Keywords</h2>
-                    <input
-                        type="text"
-                        value={keywords}
-                        onChange={(e) => setKeywords(e.target.value)}
-                        placeholder="Type some keywords..."
-                    />
-                </div>
+        {/* Tempo Slider & Wave Visualization */}
+        <div className="bg-gray-800 p-6 mt-4 rounded-lg shadow-md w-full">
+          <h2 className="text-xl font-semibold">Set Tempo</h2>
+          <input
+            type="range"
+            min="60"
+            max="160"
+            step="1"
+            value={tempo}
+            onChange={(e) => setTempo(parseInt(e.target.value))}
+            className="w-full mt-2 accent-blue-500"
+          />
+          <p className="text-lg text-gray-300 mt-2 text-center">{tempo} BPM</p>
 
-                <div className="tempo">
-                    <h2>Set Tempo</h2>
-                    <input
-                        type="range"
-                        min="60"
-                        max="160"
-                        value={tempo}
-                        onChange={(e) => setTempo(parseInt(e.target.value))}
-                    />
-                    <p>{tempo} BPM</p>
-                </div>
+          {/* Animated Wave */}
+          <div className="relative w-full h-24 overflow-hidden mt-6 flex justify-center">
+            <svg
+              viewBox="0 0 100 20"
+              className="absolute w-full h-full animate-wave"
+              style={{
+                animationDuration: `${waveSpeed}s`,
+              }}
+            >
+              <path
+                d={`M0 10 Q 10 ${10 - waveAmplitude}, 20 10 T 40 10 T 60 10 T 80 10 T 100 10`}
+                stroke="rgb(59, 130, 246)"
+                strokeWidth="2"
+                fill="none"
+              />
+            </svg>
+          </div>
+          <p className="text-sm text-gray-400 text-center mt-2">
+            Faster waves at higher BPM, slower waves at lower BPM.
+          </p>
+        </div>
 
-                <button className="predict-button" onClick={handleSubmit}>
-                    Is It a Hit?
-                </button>
+        {/* Predict Button */}
+        <button
+          className="mt-6 w-full bg-blue-600 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 transition"
+          onClick={handleSubmit}
+        >
+          Is It a Hit?
+        </button>
 
-                {popularityScore !== null && (
-                    <div className="result">
-                        <h2>Predicted Popularity Score: {popularityScore}/100</h2>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
+        {/* Display Popularity Score */}
+        {popularityScore !== null && (
+          <div className="bg-gray-800 p-6 mt-6 rounded-lg shadow-md text-center w-full">
+            <h2 className="text-2xl font-semibold">Predicted Popularity Score:</h2>
+            <p className="text-5xl font-bold text-blue-500 mt-2">{popularityScore}/100</p>
+          </div>
+        )}
+      </div>
+
+      {/* Wave Animation */}
+      <style>
+        {`
+          @keyframes waveMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50px); } /* More dramatic movement */
+          }
+
+          .animate-wave {
+            animation: waveMove infinite linear;
+          }
+        `}
+      </style>
+    </div>
+  );
 };
 
 export default Playground;

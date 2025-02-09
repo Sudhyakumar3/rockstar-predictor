@@ -11,6 +11,8 @@ const Playground = () => {
   const [showPopularThemes, setShowPopularThemes] = useState<boolean>(false);
   const [keywords, setKeywords] = useState<string>("");
   const [sentiment, setSentiment] = useState<number>(0);
+  const [tempo, setTempo] = useState<number>(110);
+  const [energy, setEnergy] = useState<number>(0.5);
   const [popularityScore, setPopularityScore] = useState<number | null>(null);
 
   const themeColorMap: Record<string, string> = {
@@ -212,6 +214,8 @@ const Playground = () => {
     const data = {
         themes: selectedThemes,
         sentiment: sentiment,
+        tempo: tempo,
+        energy: energy,
         keywords: keywords
     };
 
@@ -321,7 +325,67 @@ const Playground = () => {
 
   {/* Current Sentiment Display */}
   <p className="text-lg text-gray-300 mt-2 text-center">
-    Sentiment Score: {sentiment.toFixed(2)}
+    Sentiment: {sentiment.toFixed(2)}
+  </p>
+        </div>
+        
+
+         {/* Tempo Slider */}
+<div className="bg-gray-800 p-6 mt-4 rounded-lg shadow-md w-full">
+  <h2 className="text-xl font-semibold">Set Tempo</h2>
+  
+  <div className="flex items-center justify-between mt-2">
+    {/* Negative Sentiment Label */}
+    <span className="text-gray-300 text-sm">60 BPM</span>
+    
+    {/* Sentiment Slider */}
+    <input
+      type="range"
+      min="60"
+      max="160"
+      step="1"
+      value={tempo}
+      onChange={(e) => setTempo(parseFloat(e.target.value))}
+      className="w-full mx-4 accent-red-500"
+    />
+    
+    {/* Positive Sentiment Label */}
+    <span className="text-gray-300 text-sm">160 BPM</span>
+  </div>
+
+  {/* Current Sentiment Display */}
+  <p className="text-lg text-gray-300 mt-2 text-center">
+    Tempo: {tempo.toFixed(2)}
+  </p>
+        </div>
+        
+
+         {/* Energy Slider */}
+<div className="bg-gray-800 p-6 mt-4 rounded-lg shadow-md w-full">
+  <h2 className="text-xl font-semibold">Set Energy</h2>
+  
+  <div className="flex items-center justify-between mt-2">
+    {/* Negative Sentiment Label */}
+    <span className="text-gray-300 text-sm">0.0</span>
+    
+    {/* Sentiment Slider */}
+    <input
+      type="range"
+      min="0"
+      max="1"
+      step="0.05"
+      value={energy}
+      onChange={(e) => setEnergy(parseFloat(e.target.value))}
+      className="w-full mx-4 accent-red-500"
+    />
+    
+    {/* Positive Sentiment Label */}
+    <span className="text-gray-300 text-sm">1.0</span>
+  </div>
+
+  {/* Current Sentiment Display */}
+  <p className="text-lg text-gray-300 mt-2 text-center">
+    Energy: {energy.toFixed(2)}
   </p>
 </div>
 

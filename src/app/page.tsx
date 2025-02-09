@@ -98,7 +98,7 @@ export default function Home() {
           ]}
 
         />
-        <p className="text-xl text-white mt-4">Paste your lyrics and predict their popularity!</p>
+        <p className="text-xl text-white mt-0">Paste your lyrics and predict their popularity!</p>
 
         {/* Lyrics Input */}
         <div className="mt-8 w-full max-w-2xl">

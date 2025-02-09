@@ -6,44 +6,55 @@ import { Navbar } from "@/components/ui/Navbar";
 
 export default function Home() {
   const [lyrics, setLyrics] = useState("");
+  const [predictedScore, setPredictedScore] = useState(0);
+  const [topKeywords, setTopKeywords] = useState<string[]>([]);
+  const [sentimentScore, setSentimentScore] = useState(0);
+  const [similarSongs, setSimilarSongs] = useState<any[]>([]);
+  const [recommendations, setRecommendations] = useState([]);
   const [showResults, setShowResults] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Mock data for results (replace with API response)
-  const predictedScore = 78;
-  const topKeywords = ["Love", "Dream", "Freedom"];
-  const sentimentScore = 0.65; // Ranges from -1 (negative) to +1 (positive)
-  const similarSongs = [
-    {
-      image: "/song1.jpg",
-      name: "Shape of You",
-      artist: "Ed Sheeran",
-      themes: ["Love", "Dance", "Romance"],
-      sentiment: 0.8,
-    },
-    {
-      image: "/song2.jpg",
-      name: "Blinding Lights",
-      artist: "The Weeknd",
-      themes: ["Nostalgia", "Love", "Energy"],
-      sentiment: 0.7,
-    },
-    {
-      image: "/song3.jpg",
-      name: "Someone Like You",
-      artist: "Adele",
-      themes: ["Heartbreak", "Hope", "Love"],
-      sentiment: -0.2,
-    },
-  ];
-  const recommendations = [
-    "Consider adding more emotional words to target deeper connection.",
-    "Your themes are strong, but adding a nostalgic element might boost engagement.",
-    "A faster tempo might improve energy and make it more danceable.",
-  ];
+  const handleSubmit = async () => {
+    if (!lyrics) {
+      alert("Please enter some lyrics.");
+      return;
+    }
 
-  const handleSubmit = () => {
-    console.log("User lyrics:", lyrics);
-    setShowResults(true); // Show the results popup
+    setIsLoading(true); // Show loading state
+    try {
+      const response = await fetch("http://127.0.0.1:5000/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ lyrics }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze lyrics.");
+      }
+
+      const data = await response.json();
+      console.log("Analysis results:", data);
+
+      // Update state with API response
+      setPredictedScore(data.popularity_score);
+      setTopKeywords(data.top_keywords);
+      setSentimentScore(data.sentiment_score);
+      setSimilarSongs(
+        data.similar_songs.map((song: any, index: number) => ({
+          ...song,
+          image: `/song${index + 1}.jpg`, // Replace with actual image paths if available
+        }))
+      );
+      setRecommendations(Array.isArray(data.recommendations) ? data.recommendations : []);
+      setShowResults(true);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while analyzing the lyrics. Please try again.");
+    } finally {
+      setIsLoading(false); // Hide loading state
+    }
   };
 
   return (
@@ -69,8 +80,9 @@ export default function Home() {
         <button
           onClick={handleSubmit}
           className="mt-4 bg-blue-600 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300"
+          disabled={isLoading}
         >
-          Analyze Lyrics
+          {isLoading ? "Analyzing..." : "Analyze Lyrics"}
         </button>
       </div>
 
@@ -122,21 +134,20 @@ export default function Home() {
               <h3 className="text-xl font-semibold mb-3">Similar Songs</h3>
               <div className="grid grid-cols-3 gap-4">
                 {similarSongs.map((song, index) => (
-                  <div key={index} className="bg-gray-700 p-4 rounded-lg shadow-lg text-center">
-                    <img src={song.image} alt={song.name} className="w-full h-32 object-cover rounded-md mb-2" />
-                    <h4 className="text-lg font-bold">{song.name}</h4>
-                    <p className="text-gray-400">{song.artist}</p>
-                    <p className="text-gray-300 text-sm mt-1">Themes: {song.themes.join(", ")}</p>
-                    <p className="text-sm mt-1">
-                      Sentiment:{" "}
-                      <span className={song.sentiment > 0 ? "text-green-400" : "text-red-400"}>
-                        {song.sentiment > 0 ? "Positive" : "Negative"}
-                      </span>
-                    </p>
-                  </div>
+                <div key={index} className="bg-gray-700 p-4 rounded-lg shadow-lg text-center">
+                  <img
+                  src={song.image_url || "/default-image.jpg"}  // Use the image_url from the backend, or a default if not available
+                  alt={song.title}
+                  className="w-full h-32 object-cover rounded-md mb-2"
+                  />
+                  <h4 className="text-lg font-bold">{song.title}</h4>
+                  <p className="text-gray-400">{song.artist}</p>
+                  <p className="text-gray-300 text-sm mt-1">Themes: {song.themes.join(", ")}</p>
+                </div>
                 ))}
               </div>
             </div>
+
 
             {/* Recommendations */}
             <div>

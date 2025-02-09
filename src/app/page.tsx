@@ -13,6 +13,7 @@ export default function Home() {
   const [recommendations, setRecommendations] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showLyrics, setShowLyrics] = useState(false); // Controls expanding lyrics box
 
   const handleSubmit = async () => {
     if (!lyrics) {
@@ -20,7 +21,7 @@ export default function Home() {
       return;
     }
 
-    setIsLoading(true); // Show loading state
+    setIsLoading(true);
     try {
       const response = await fetch("http://127.0.0.1:5000/analyze", {
         method: "POST",
@@ -37,14 +38,13 @@ export default function Home() {
       const data = await response.json();
       console.log("Analysis results:", data);
 
-      // Update state with API response
       setPredictedScore(data.popularity_score);
       setTopKeywords(data.top_keywords);
       setSentimentScore(data.sentiment_score);
       setSimilarSongs(
         data.similar_songs.map((song: any, index: number) => ({
           ...song,
-          image: `/song${index + 1}.jpg`, // Replace with actual image paths if available
+          image: `/song${index + 1}.jpg`,
         }))
       );
       setRecommendations(Array.isArray(data.recommendations) ? data.recommendations : []);
@@ -53,19 +53,18 @@ export default function Home() {
       console.error("Error:", error);
       alert("An error occurred while analyzing the lyrics. Please try again.");
     } finally {
-      setIsLoading(false); // Hide loading state
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="relative flex flex-col items-center min-h-screen bg-gray-900 text-white px-4">
       <Navbar />
-
       <WavyBackground />
 
-      {/* Lyrics Input Box at the Top */}
+      {/* Lyrics Input Box */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10 mt-20">
-        <h1 className="text-6xl font-bold tracking-wide">Rockstar Predictor 🎸</h1>
+        <h1 className="text-6xl font-bold tracking-wide">Rockstar Predictor</h1>
         <p className="text-xl text-gray-300 mt-4">Paste your lyrics and predict their popularity!</p>
 
         <div className="mt-8 w-full max-w-2xl">
@@ -87,32 +86,55 @@ export default function Home() {
       </div>
 
       {/* Results Popup */}
-      {showResults && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md z-50">
-          <div className="bg-gray-800 text-white p-8 rounded-lg max-w-3xl w-full shadow-lg">
-            <h2 className="text-3xl font-bold mb-4">Analysis Results</h2>
+        {showResults && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md z-50">
+            <div className="bg-gray-900 bg-opacity-80 text-white p-8 w-full max-w-5xl max-h-[80vh] shadow-lg overflow-y-auto relative results-popup border border-gray-600">
+        
 
-            {/* Display User Lyrics */}
-            <div className="bg-gray-700 p-4 rounded-lg mb-4">
-              <h3 className="text-xl font-semibold mb-2">Your Lyrics</h3>
-              <p className="text-gray-300">{lyrics || "No lyrics provided."}</p>
+            
+            {/* Close Button */}
+            <button
+              onClick={() => setShowResults(false)}
+              className="absolute top-4 right-4 bg-red-600 text-white p-2 rounded-lg hover:bg-red-700 transition"
+            >
+              ✕
+            </button>
+
+            <h2 className="text-3xl font-bold mb-4 text-center">Analysis Results</h2>
+
+            {/* Expandable User Lyrics Section */}
+            <div className="bg-gray-700 rounded-lg mb-4 overflow-hidden transition-all">
+              <button
+                className="w-full text-left px-4 py-3 font-semibold text-lg bg-gray-600 hover:bg-gray-500 transition"
+                onClick={() => setShowLyrics(!showLyrics)}
+              >
+                Your Lyrics {showLyrics ? "▼" : "▶"}
+              </button>
+              {showLyrics && (
+                <div className="p-4 text-gray-300">
+                  <p>{lyrics || "No lyrics provided."}</p>
+                </div>
+              )}
             </div>
 
-            {/* Popularity Score */}
-            <div className="mb-4">
-              <h3 className="text-xl font-semibold">Predicted Popularity</h3>
-              <p className="text-2xl font-bold text-blue-400">{predictedScore}/100</p>
+            {/* Popularity Score & Top Keywords in One Line */}
+            <div className="mb-3 flex justify-between items-center">
+              {/* Popularity Score */}
+              <div className="flex flex-col">
+                <h3 className="text-xl font-semibold">Predicted Popularity</h3>
+                <p className="text-2xl font-bold text-blue-400">{predictedScore}/100</p>
+              </div>
+
+              {/* Top Keywords */}
+              <div className="flex flex-col text-right">
+                <h3 className="text-xl font-semibold">Top Keywords</h3>
+                <p className="text-gray-300">{topKeywords.join(", ")}</p>
+              </div>
             </div>
 
-            {/* Top Keywords */}
-            <div className="mb-4">
-              <h3 className="text-xl font-semibold">Top Keywords</h3>
-              <p className="text-gray-300">{topKeywords.join(", ")}</p>
-            </div>
-
-            {/* Sentiment Analysis Slider */}
+            {/* Sentiment Analysis */}
             <div className="mb-6">
-              <h3 className="text-xl font-semibold">Sentiment Analysis</h3>
+              <h3 className="text-xl font-semibold text-center">Sentiment Analysis</h3>
               <input
                 type="range"
                 min="-1"
@@ -130,34 +152,44 @@ export default function Home() {
             </div>
 
             {/* Similar Songs */}
-            <div className="mb-6">
+            <div className="mb-6 text-center">
               <h3 className="text-xl font-semibold mb-3">Similar Songs</h3>
               <div className="grid grid-cols-3 gap-4">
                 {similarSongs.map((song, index) => (
-                <div key={index} className="bg-gray-700 p-4 rounded-lg shadow-lg text-center">
-                  <img
-                  src={song.image_url || "/default-image.jpg"}  // Use the image_url from the backend, or a default if not available
-                  alt={song.title}
-                  className="w-full h-32 object-cover rounded-md mb-2"
-                  />
-                  <h4 className="text-lg font-bold">{song.title}</h4>
-                  <p className="text-gray-400">{song.artist}</p>
-                  <p className="text-gray-300 text-sm mt-1">Themes: {song.themes.join(", ")}</p>
-                </div>
+                  <div key={index} className="bg-gray-700 p-4 rounded-lg shadow-lg text-center">
+                    <img
+                      src={song.image_url || "/default-image.jpg"}
+                      alt={song.title}
+                      className="w-full h-32 object-cover rounded-md mb-2"
+                    />
+                    <h4 className="text-lg font-bold">{song.title}</h4>
+                    <p className="text-gray-400">{song.artist}</p>
+                    <p className="text-gray-300 text-sm mt-1">Themes: {song.themes.join(", ")}</p>
+                  </div>
                 ))}
               </div>
             </div>
 
-
             {/* Recommendations */}
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Recommendations</h3>
-              <ul className="list-disc list-inside text-gray-300">
-                {recommendations.map((rec, index) => (
-                  <li key={index}>{rec}</li>
-                ))}
-              </ul>
+            <div className="text-center">
+              <h3 className="text-xl font-semibold mb-4">Recommendations</h3>
+              <div className="bg-gray-800 p-5 rounded-lg shadow-lg inline-block text-left max-w-3xl mx-auto">
+                {/* Extract the first line only if it's not a recommendation */}
+                <p className="text-gray-300 mb-3">
+                  {recommendations[0].includes("Here are some suggestions") ? recommendations[0] : "Here are some suggestions to improve the song:"}
+                </p>
+                <ul className="list-disc list-inside text-gray-300 space-y-3">
+                  {recommendations.slice(1).map((rec, index) => (
+                    <li key={index} className="leading-relaxed">
+                      {rec.replace(/^\*\s*/, '')} {/* Removes the '*' at the start */}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
+
+
+
 
             {/* Close Button */}
             <button

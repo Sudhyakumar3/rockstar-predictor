@@ -131,7 +131,8 @@ def generate_recommendations(lyrics):
         stream=False
     )
     recommendations = chat_completion.choices[0].message.content.split('\n')
-    return [rec.strip('- ') for rec in recommendations if rec.strip()]
+    cleaned_recommendations = [rec.strip('- ') for rec in recommendations if rec.strip()]
+    return cleaned_recommendations[:4]  # Limit to 3 recommendations
 
 @app.route("/")
 def home():

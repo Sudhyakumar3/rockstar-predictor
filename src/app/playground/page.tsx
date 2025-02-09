@@ -1,38 +1,83 @@
 "use client";
 
-import { useState, ChangeEvent, MouseEvent } from "react";
+import { useState, ChangeEvent, MouseEvent, FocusEvent } from "react";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import { Navbar } from "@/components/ui/Navbar";
+
+interface ThemePopularity {
+  name: string;
+  count: number;
+}
 
 const Playground = () => {
   const [themeInput, setThemeInput] = useState<string>("");
   const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
   const [filteredThemes, setFilteredThemes] = useState<string[]>([]);
+  const [showPopularThemes, setShowPopularThemes] = useState<boolean>(false);
   const [keywords, setKeywords] = useState<string>("");
   const [tempo, setTempo] = useState<number>(120);
   const [popularityScore, setPopularityScore] = useState<number | null>(null);
 
-  // Adjust wave properties dynamically
-  const waveFrequency = Math.max(3, (tempo - 60) / 6); // More waves at higher BPM
-  const waveAmplitude = Math.max(1, (tempo - 60) / 10); // Taller waves at higher BPM
-  const waveSpeed = Math.max(0.3, (200 - tempo) / 50); // Faster at higher BPM
+  // Adjust wave properties dynamically based on tempo
+  const waveFrequency = Math.max(3, (tempo - 60) / 6);
+  const waveAmplitude = Math.max(2, (tempo - 60) / 10);
+  const waveSpeed = Math.max(0.5, (200 - tempo) / 50);
 
-  // Theme Selection
+  // Full theme list
   const allThemes: string[] = [
-    "power", "love", "freedom", "heartbreak", "party", "motivation", "confidence",
-    "revenge", "fear", "betrayal", "romance", "happiness", "loneliness", "success",
+    "power", "disillusionment", "toxic relationship", "intimacy", "pride", "murder", "trauma", "darkness",
+    "family", "regret", "responsibility", "hedonism", "violence", "travel", "grief", "sex", "love",
+    "observation", "indulgence", "relationships", "confusion", "doubt", "hustle", "drama", "outcasts",
+    "whiskey", "holiday", "deception", "isolation", "empowerment", "trust", "pain", "goodness", "opposition",
+    "lifestyle", "celebration", "party", "self-empowerment", "vengeance", "mistrust", "carelessness", "excess",
+    "abandonment", "flirtation", "solidarity", "dislike", "confidence", "poverty", "christmas", "protection",
+    "manipulation", "obsession", "ambition", "guilt", "streetlife", "attraction", "resilience", "loathing",
+    "forever", "joy", "sadness", "hate", "denial", "loyalty", "respect", "desire", "moving on", "liberation",
+    "freedom", "vulnerability", "money", "anxiety", "loss", "summer", "popularity", "pleasure", "friendship",
+    "happiness", "criticism", "swagger", "commitment", "seduction", "diss", "romance", "materialism",
+    "affection", "drugs", "heartbreak", "uncertainty", "fear", "acceptance", "nostalgia", "fame",
+    "cheating", "drinking", "betrayal", "longing", "infidelity", "jealousy", "devotion", "roots", "winter",
+    "concern", "evil", "detachment", "mortality", "appreciation", "lies", "success", "insecurity", "struggle",
+    "self-blame", "mockery", "anger", "fun", "self-love", "perseverance", "wealth", "paranoia", "frustration",
+    "gratitude", "makeover", "desperation", "motivation", "dance", "loneliness", "toughness", "rebellion",
+    "self-discovery", "innocence", "spirituality", "independence", "youth", "danger", "addiction",
+    "revenge", "identity", "cheer", "sarcasm", "lust", "aggression", "forgiveness", "disappointment",
+    "crime", "toxicity"
   ];
 
+  // Popular themes list for autosuggest
+  const themePopularity: ThemePopularity[] = [
+    { name: "love", count: 135 }, { name: "heartbreak", count: 102 }, { name: "sadness", count: 57 },
+    { name: "party", count: 47 }, { name: "motivation", count: 39 }, { name: "wealth", count: 29 },
+    { name: "christmas", count: 21 }, { name: "freedom", count: 18 }, { name: "confidence", count: 15 },
+    { name: "empowerment", count: 15 }, { name: "friendship", count: 14 }, { name: "desire", count: 14 }
+  ];
+
+  // Show popular themes when input is clicked
+  const handleInputFocus = (e: FocusEvent<HTMLInputElement>) => {
+    if (!themeInput) {
+      setFilteredThemes(themePopularity.map(t => t.name));
+      setShowPopularThemes(true);
+    }
+  };
+
+  // Update suggestions based on user input
   const handleThemeInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value.toLowerCase();
     setThemeInput(input);
+    setShowPopularThemes(false);
+
     if (input.length > 0) {
-      setFilteredThemes(allThemes.filter((theme) => theme.includes(input)).slice(0, 5));
+      const matches = allThemes
+        .filter(theme => theme.includes(input))
+        .slice(0, 5);
+      setFilteredThemes(matches);
     } else {
       setFilteredThemes([]);
     }
   };
 
+  // Add selected theme (limit 3)
   const selectTheme = (theme: string) => {
     if (selectedThemes.length < 3 && !selectedThemes.includes(theme)) {
       setSelectedThemes([...selectedThemes, theme]);
@@ -41,35 +86,41 @@ const Playground = () => {
     setFilteredThemes([]);
   };
 
+  // Remove selected theme
   const removeTheme = (theme: string) => {
-    setSelectedThemes(selectedThemes.filter((t) => t !== theme));
+    setSelectedThemes(selectedThemes.filter(t => t !== theme));
   };
 
+  // Handle form submission
   const handleSubmit = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const fakeScore = Math.floor(Math.random() * 100);
-    setPopularityScore(fakeScore);
+    setPopularityScore(Math.floor(Math.random() * 100));
   };
 
   return (
-    <div className="relative flex flex-col items-center min-h-screen bg-gray-900 text-white px-4">
+    <div className="relative flex flex-col items-center h-screen bg-gray-900 text-white px-4">
       <Navbar />
-      <WavyBackground />
+      <div className="absolute top-0 w-full h-[100vh] overflow-hidden">
+        <WavyBackground />
+      </div>
 
-      <div className="relative z-10 mt-24 w-full max-w-3xl">
-        <h1 className="text-5xl font-bold text-center">Song Popularity Playground 🎵</h1>
+
+      {/* Main Content Box */}
+      <div className="absolute top-[20%] z-10 w-full max-w-3xl bg-black bg-opacity-70 p-8 rounded-lg shadow-lg">
+        <h1 className="text-5xl font-bold text-center">Song Popularity Playground</h1>
         <p className="text-lg text-gray-300 text-center mt-2">
           Experiment with themes, keywords, and tempo to see if your song is a hit!
         </p>
 
         {/* Theme Selection */}
-        <div className="bg-gray-800 p-6 mt-6 rounded-lg shadow-md w-full">
+        <div className="bg-gray-800 bg-opacity-90 p-6 mt-6 rounded-lg shadow-md w-full">
           <h2 className="text-xl font-semibold">Select Up to 3 Themes</h2>
           <input
             type="text"
             placeholder="Type a theme..."
             value={themeInput}
             onChange={handleThemeInputChange}
+            onFocus={handleInputFocus}
             className="mt-2 w-full p-2 text-black rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500"
           />
           {filteredThemes.length > 0 && (
@@ -86,7 +137,7 @@ const Playground = () => {
             </div>
           )}
 
-          {/* Selected Themes */}
+          {/* Display selected themes */}
           <div className="mt-3 flex flex-wrap gap-2">
             {selectedThemes.map((theme, index) => (
               <span key={index} className="bg-blue-500 text-white px-3 py-1 rounded-md">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { WavyBackground } from "../components/ui/wavy-background";
 import { Navbar } from "@/components/ui/Navbar";
 import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
@@ -54,6 +54,30 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+
+  // Animation state for the popup
+  const [popupAnimation, setPopupAnimation] = useState<'fadeIn' | 'fadeOut' | 'none'>('none');
+
+  // useEffect to handle the animation when showResults changes
+  useEffect(() => {
+    if (showResults) {
+      setPopupAnimation('fadeIn');
+    } else if (popupAnimation === 'fadeIn') {
+      // Start fadeOut animation when closing
+      setPopupAnimation('fadeOut');
+      // After the animation, hide the results
+      const timer = setTimeout(() => {
+        setPopupAnimation('none');
+      }, 300); // Duration should match the CSS animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [showResults]);
+
+  // Function to close the modal, now handled by useEffect and animation state
+  const closeResults = () => {
+    setShowResults(false);
+  };
+
 
   return (
     <div className="relative flex flex-col items-center min-h-screen bg-gray-900 text-white px-4">
@@ -122,14 +146,15 @@ export default function Home() {
 
       {/* Results Popup */}
         {showResults && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md z-50">
+          <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md z-50
+          ${popupAnimation === 'fadeIn' ? 'animate-fadeIn' : popupAnimation === 'fadeOut' ? 'animate-fadeOut' : 'hidden'}`}>
             <div className="bg-gray-900 bg-opacity-80 text-white p-8 w-full max-w-5xl max-h-[80vh] shadow-lg overflow-y-auto relative results-popup border border-gray-600">
         
 
             
             {/* Close Button */}
             <button
-              onClick={() => setShowResults(false)}
+              onClick={() => closeResults()}
               className="absolute top-4 right-4 bg-red-600 text-white p-2 rounded-lg hover:bg-red-700 transition"
             >
               ✕
@@ -158,9 +183,7 @@ export default function Home() {
               <div className="flex flex-col">
                 <h3 className="text-xl font-semibold">Predicted Popularity</h3>
                 <p className="text-2xl font-bold text-blue-400">{predictedScore}/100</p>
-              </div>
-
-              {/* Top Keywords */}
+              </div>... {/* Top Keywords */}
               <div className="flex flex-col text-right">
                 <h3 className="text-xl font-semibold">Top Keywords</h3>
                 <p className="text-gray-300">{topKeywords.join(", ")}</p>
@@ -234,7 +257,7 @@ export default function Home() {
 
             {/* Close Button */}
             <button
-              onClick={() => setShowResults(false)}
+              onClick={() => closeResults()}
               className="mt-6 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition"
             >
               Close

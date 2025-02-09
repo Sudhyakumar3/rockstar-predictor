@@ -7,7 +7,6 @@ export function Navbar() {
       <div className="max-w-4xl mx-auto flex justify-center items-center space-x-6">
         <div className="flex space-x-6">
           <Link href="/" className="hover:text-gray-400">Home</Link>
-          <Link href="/about" className="hover:text-gray-400">About</Link>
           <Link href="/analytics" className="hover:text-gray-400">Data Analytics</Link>
           <Link href="/playground" className="hover:text-gray-400">Playground</Link>
         </div>

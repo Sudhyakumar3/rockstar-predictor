@@ -71,3 +71,30 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom Scrollbar for the results popup */
+.results-popup::-webkit-scrollbar {
+  width: 8px; /* Thin scrollbar */
+}
+
+.results-popup::-webkit-scrollbar-track {
+  background: #2d2d2d; /* Dark background */
+  border-radius: 10px;
+}
+
+.results-popup::-webkit-scrollbar-thumb {
+  background: #4a4a4a; /* Gray thumb */
+  border-radius: 10px;
+}
+
+.results-popup::-webkit-scrollbar-thumb:hover {
+  background: #6b6b6b; /* Lighter on hover */
+}
+
+.results-popup {
+  backdrop-filter: blur(16px); /* Increase the blur for a frosted glass effect */
+  background: rgba(30, 30, 30, 0); /* Darker but more transparent */
+  border-radius: 8px; /* Subtle rounded corners */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0px 0px 30px rgba(255, 255, 255, 0.1);
+}

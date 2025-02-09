@@ -164,6 +164,38 @@ def analyze():
 
     return jsonify(response)
 
+def serialize_song(song):
+    """Convert MongoDB document to JSON-serializable format."""
+    song['_id'] = str(song['_id'])  # Convert ObjectId to string
+    return song
+
+@app.route("/analytics/top-songs", methods=["GET"])
+def get_top_songs_by_month_year():
+    month = request.args.get("month")  # Extract month from query parameters
+    year = request.args.get("year")  # Extract year from query parameters
+
+    if not month or not year:
+        return jsonify({"error": "Month and year are required as query parameters."}), 400
+
+    try:
+        month_num = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ].index(month) + 1  # Convert month name to number
+        year = int(year)
+    except ValueError:
+        return jsonify({"error": "Invalid month or year"}), 400
+
+    target_date = f"{year}-{month_num:02d}-01"
+    print(target_date)
+    query = {"dates": target_date}
+    songs = list(collection.find(query))
+
+    sorted_songs = sorted(songs, key=lambda x: x.get('popularity', 0), reverse=True)[:5]
+    serialized_songs = [serialize_song(song) for song in sorted_songs]
+
+    return jsonify({"top_songs": serialized_songs})
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
 

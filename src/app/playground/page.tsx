@@ -10,7 +10,6 @@ const Playground = () => {
   const [filteredThemes, setFilteredThemes] = useState<string[]>([]);
   const [showPopularThemes, setShowPopularThemes] = useState<boolean>(false);
   const [keywords, setKeywords] = useState<string>("");
-  const [tempo, setTempo] = useState<number>(120);
   const [sentiment, setSentiment] = useState<number>(0);
   const [popularityScore, setPopularityScore] = useState<number | null>(null);
 
@@ -206,9 +205,32 @@ const Playground = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setPopularityScore(Math.floor(Math.random() * 100));
+
+    // Collect data to send to the Flask API
+    const data = {
+        themes: selectedThemes,
+        sentiment: sentiment,
+        keywords: keywords
+    };
+
+    // Send POST request to Flask backend
+    try {
+        const response = await fetch('http://localhost:5000/predict-popularityP', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+        setPopularityScore(result.popularityScore);
+    } catch (error) {
+        console.error('Error predicting popularity:', error);
+        setPopularityScore(null);
+    }
   };
 
   return (
@@ -219,7 +241,7 @@ const Playground = () => {
       <div className="absolute top-[20%] z-10 w-full max-w-3xl bg-black bg-opacity-70 p-8 rounded-lg shadow-lg">
         <h1 className="text-5xl font-bold text-center">Song Popularity Playground</h1>
         <p className="text-lg text-gray-300 text-center mt-2">
-          Experiment with themes, keywords, and tempo to see if your song is a hit!
+          Experiment with themes, keywords, and sentiment to see if your song is a hit!
         </p>
 
         {/* Theme Selection */}
@@ -272,30 +294,6 @@ const Playground = () => {
             onChange={(e) => setKeywords(e.target.value)}
             className="mt-2 w-full p-2 text-black rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500"
           />
-        </div>
-
-        {/* Tempo Slider */}
-        <div className="bg-gray-800 p-6 mt-4 rounded-lg shadow-md w-full">
-          <h2 className="text-xl font-semibold">Set Tempo</h2>
-          <div className="flex items-center justify-between mt-2">
-              {/* Left Label */}
-              <span className="text-gray-300 text-sm">60 BPM</span>
-              
-              {/* Slider */}
-              <input
-                type="range"
-                min="60"
-                max="160"
-                step="1"
-                value={tempo}
-                onChange={(e) => setTempo(parseInt(e.target.value))}
-                className="w-full mx-4 accent-blue-500"
-              />
-              
-              {/* Right Label */}
-              <span className="text-gray-300 text-sm">160 BPM</span>
-            </div>
-          <p className="text-lg text-gray-300 mt-2 text-center">{tempo} BPM</p>
         </div>
 
         {/* Sentiment Slider */}

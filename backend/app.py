@@ -58,6 +58,36 @@ def analyze_sentiment(lyrics):
     sentiment = sia.polarity_scores(lyrics)
     return sentiment['compound']
 
+# Theme extraction and popularity prediction logic
+@app.route('/predict-popularityP', methods=['POST'])
+def predict_popularityP():
+    data = request.json
+    themes = data['themes']
+    sentiment = data['sentiment']
+    keywords = data['keywords']
+
+    # Generate theme string and sentiment adjustment
+    theme_string = " ".join([theme.lower().strip() for theme in themes])  # Normalize
+    theme_embedding = model.encode([theme_string])
+
+    # Fetch songs from MongoDB
+    songs = list(collection.find({"themes": {"$exists": True, "$ne": []}}, {"themes": 1, "popularity": 1}))
+    
+    if not songs:
+        return jsonify({"popularityScore": 50})  # Fallback if no songs are found
+
+    # Encode each song's themes and calculate similarity
+    song_embeddings = model.encode([" ".join(song["themes"]).lower() for song in songs])
+    similarities = cosine_similarity(theme_embedding, song_embeddings)[0]
+    
+    # Top 5 most similar songs based on themes
+    top_indices = [i for i in similarities.argsort()[::-1] if similarities[i] > 0.1][:5]  # Only consider high similarity
+    popularity_scores = [songs[i].get("popularity", 0) for i in top_indices if songs[i].get("popularity", 0) > 0]
+    
+    # Compute and return the average popularity score
+    popularity_score = np.mean(popularity_scores) if popularity_scores else 50
+    return jsonify({"popularityScore": popularity_score})
+
 def predict_popularity(themes, model, collection):
     theme_string = " ".join([theme.lower().strip() for theme in themes])  # Normalize
     theme_embedding = model.encode([theme_string])

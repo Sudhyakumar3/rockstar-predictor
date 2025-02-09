@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ChangeEvent, MouseEvent, FocusEvent } from "react";
+import { useState } from "react";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import { Navbar } from "@/components/ui/Navbar";
 
@@ -14,84 +14,107 @@ const About = () => {
   return (
     <div className="relative flex flex-col items-center min-h-screen bg-gray-900 text-white px-4">
       <Navbar />
-      <div className="max-w-4xl mt-16 text-center">
-        <h1 className="text-5xl font-bold">About Rockstar Predictor 🎸</h1>
+
+      {/* Wavy Background */}
+      <div className="absolute top-0 w-full h-[100vh] overflow-hidden">
+        <WavyBackground />
+      </div>
+
+      {/* Content Container */}
+      <div className="relative z-10 w-full max-w-4xl mt-16 text-center">
+        <h1 className="text-5xl font-bold">About Rockstar Predictor</h1>
         <p className="text-lg text-gray-300 mt-4">
           Discover how our AI-powered tool predicts a song’s popularity based on lyrics, themes, and tempo.
         </p>
       </div>
 
-      <div className="max-w-3xl mt-12 space-y-6">
-        {/* How It Works */}
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold cursor-pointer" onClick={() => toggleSection("howItWorks")}>How Does It Work?</h2>
-          {openSection === "howItWorks" && (
-            <p className="text-gray-300 mt-2">
-              Ever wondered what makes a song a chart-topping hit? Rockstar Predictor analyzes your lyrics to predict their popularity, key themes, and optimal tempo based on patterns found in successful songs. Whether you're a songwriter, musician, or just curious, our tool helps you explore the science behind hit songs and how themes and lyrics influence success.
-            </p>
+      {/* Accordion Sections */}
+      <div className="relative z-10 w-full max-w-3xl mt-8 space-y-4">
+        {/* Section 1: How Does It Work? */}
+        <div className="bg-gray-800 bg-opacity-90 rounded-lg shadow-md">
+          <button
+            className="w-full text-left px-6 py-4 font-semibold text-lg"
+            onClick={() => toggleSection("how-it-works")}
+          >
+            How Does It Work?
+          </button>
+          {openSection === "how-it-works" && (
+            <div className="px-6 pb-4 text-gray-300">
+              Ever wondered what makes a song a <b>chart-topping hit</b>? Rockstar Predictor analyzes your lyrics to
+              predict their popularity, key themes, and optimal tempo based on patterns found in successful songs.
+              Whether you're a songwriter, musician, or just curious, our tool helps you explore the science behind
+              hit songs and how themes and lyrics influence success.
+            </div>
           )}
         </div>
 
-        {/* How Lyrics Are Analyzed */}
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold cursor-pointer" onClick={() => toggleSection("analyzeLyrics")}>How Do We Analyze Your Lyrics?</h2>
-          {openSection === "analyzeLyrics" && (
-            <ul className="text-gray-300 mt-2 list-disc list-inside">
-              <li><strong>Extracts Keywords:</strong> Identifies key phrases that define your song’s message.</li>
-              <li><strong>Matches Themes:</strong> Detects overarching themes like love, heartbreak, rebellion, nostalgia.</li>
-              <li><strong>Performs Sentiment Analysis:</strong> Determines if the lyrics express a positive, negative, or neutral tone.</li>
-              <li><strong>Suggests an Optimal Tempo:</strong> Recommends a BPM range based on similar hit songs.</li>
-              <li><strong>Compares to Popular Songs:</strong> Checks how your lyrics align with historical hit data.</li>
-            </ul>
+        {/* Section 2: How Do We Analyze Your Lyrics? */}
+        <div className="bg-gray-800 bg-opacity-90 rounded-lg shadow-md">
+          <button
+            className="w-full text-left px-6 py-4 font-semibold text-lg"
+            onClick={() => toggleSection("analyze-lyrics")}
+          >
+            How Do We Analyze Your Lyrics?
+          </button>
+          {openSection === "analyze-lyrics" && (
+            <div className="px-6 pb-4 text-gray-300">
+              When you input lyrics, our system:
+              <ul className="list-disc ml-6 mt-2 space-y-2">
+                <li><b>Extracts Keywords</b> – Identifies relevant words and phrases that define the song’s message.</li>
+                <li><b>Matches Themes</b> – Detects overarching themes (e.g., love, heartbreak, rebellion, nostalgia) found in popular songs.</li>
+                <li><b>Performs Sentiment Analysis</b> – Determines whether the lyrics express a positive, negative, or neutral emotional tone.</li>
+                <li><b>Suggests an Optimal Tempo</b> – Recommends a BPM (beats per minute) range based on themes found in similar hit songs.</li>
+                <li><b>Compares to Popular Songs</b> – Looks at historical hit data to gauge how well the song aligns with trends.</li>
+              </ul>
+              This information is combined into a popularity score and insightful recommendations to help you refine your lyrics.
+            </div>
           )}
         </div>
 
-        {/* Popularity Score */}
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold cursor-pointer" onClick={() => toggleSection("popularityScore")}>How Is the Popularity Score Determined?</h2>
-          {openSection === "popularityScore" && (
-            <p className="text-gray-300 mt-2">
-              The score is based on themes, emotional impact, keyword strength, structural similarity to successful songs, and suggested tempo fit.
-            </p>
+        {/* Section 3: How Is the Popularity Score Determined? */}
+        <div className="bg-gray-800 bg-opacity-90 rounded-lg shadow-md">
+          <button
+            className="w-full text-left px-6 py-4 font-semibold text-lg"
+            onClick={() => toggleSection("popularity-score")}
+          >
+            How Is the Popularity Score Determined?
+          </button>
+          {openSection === "popularity-score" && (
+            <div className="px-6 pb-4 text-gray-300">
+              Your song receives a popularity score (out of 100) based on a combination of factors:
+              <ul className="list-disc ml-6 mt-2 space-y-2">
+                <li><b>Strong, recognizable themes</b> – Songs with clear, relatable themes tend to perform better.</li>
+                <li><b>Emotional impact</b> – Lyrics that evoke strong emotions are more memorable and engaging.</li>
+                <li><b>Keyword strength</b> – Certain words resonate deeply with audiences and contribute to hit-making patterns.</li>
+                <li><b>Structural similarity to successful songs</b> – If your song shares characteristics with historically popular hits, it may have a higher chance of success.</li>
+                <li><b>Suggested Tempo Fit</b> – If your song’s themes align with a genre or hit-making trend, we suggest a tempo range (BPM) that works well for those themes.</li>
+              </ul>
+              While lyrics alone don’t guarantee a hit, Rockstar Predictor provides data-driven insights that can help songwriters refine their lyrics, select strong themes, and determine an ideal tempo.
+            </div>
           )}
         </div>
 
-        {/* Importance of Themes */}
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold cursor-pointer" onClick={() => toggleSection("themes")}>Why Are Themes Important?</h2>
-          {openSection === "themes" && (
-            <p className="text-gray-300 mt-2">
-              Themes define a song’s story. Popular themes include love & relationships, motivation, emotional struggles, and partying & celebration.
-            </p>
+        {/* Section 4: Why Are Themes Important? */}
+        <div className="bg-gray-800 bg-opacity-90 rounded-lg shadow-md">
+          <button
+            className="w-full text-left px-6 py-4 font-semibold text-lg"
+            onClick={() => toggleSection("themes-importance")}
+          >
+            Why Are Themes Important?
+          </button>
+          {openSection === "themes-importance" && (
+            <div className="px-6 pb-4 text-gray-300">
+              Every song tells a story, and themes define what that story is about. We analyzed thousands of successful songs to identify common themes in popular music. Some of the most influential themes include:
+              <ul className="list-disc ml-6 mt-2 space-y-2">
+                <li><b>Love & Relationships</b> – Romance, heartbreak, longing, and devotion dominate the charts.</li>
+                <li><b>Motivation & Empowerment</b> – Songs about success, resilience, and confidence inspire audiences.</li>
+                <li><b>Emotions & Struggles</b> – Themes like sadness, nostalgia, regret, anger, and grief add depth to songwriting.</li>
+                <li><b>Partying & Celebration</b> – High-energy songs about fun, excess, and letting go remain fan favorites.</li>
+              </ul>
+              Our system identifies dominant themes in your lyrics and compares them to hit songs across multiple genres to give insights into your song's potential.
+            </div>
           )}
         </div>
-
-        {/* Keywords & Hit Songs */}
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold cursor-pointer" onClick={() => toggleSection("keywords")}>Why Keywords Matter in Hit Songs</h2>
-          {openSection === "keywords" && (
-            <p className="text-gray-300 mt-2">
-              Keywords reinforce a song’s message and make lyrics catchy. Romantic songs often include words like "love," "forever," and "heart."
-            </p>
-          )}
-        </div>
-
-        {/* Playground Feature */}
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold cursor-pointer" onClick={() => toggleSection("playground")}>Explore the Playground</h2>
-          {openSection === "playground" && (
-            <p className="text-gray-300 mt-2">
-              Use our interactive Playground to experiment with themes, keywords, and tempo settings to see how they influence a song’s popularity score.
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Call to Action */}
-      <div className="mt-12">
-        <a href="/playground" className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition">
-          Try the Playground
-        </a>
       </div>
     </div>
   );

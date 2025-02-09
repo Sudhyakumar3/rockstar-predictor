@@ -98,7 +98,7 @@ const Playground = () => {
   };
 
   return (
-    <div className="relative flex flex-col items-center h-screen bg-gray-900 text-white px-4">
+    <div className="relative flex flex-col items-center min-h-screen bg-gray-900 text-white px-4">
       <Navbar />
       <div className="absolute top-0 w-full h-[100vh] overflow-hidden">
         <WavyBackground />

@@ -15,10 +15,7 @@ const About = () => {
     <div className="relative flex flex-col items-center min-h-screen bg-gray-900 text-white px-4">
       <Navbar />
 
-      {/* Wavy Background */}
-      <div className="absolute top-0 w-full h-[100vh] overflow-hidden">
-        <WavyBackground />
-      </div>
+      
 
       {/* Content Container */}
       <div className="relative z-10 w-full max-w-4xl mt-16 text-center">

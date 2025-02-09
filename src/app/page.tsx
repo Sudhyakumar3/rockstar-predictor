@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { WavyBackground } from "../components/ui/wavy-background";
 import { Navbar } from "@/components/ui/Navbar";
+import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
 
 export default function Home() {
   const [lyrics, setLyrics] = useState("");
@@ -20,31 +21,26 @@ export default function Home() {
       return;
     }
 
-    setIsLoading(true); // Show loading state
+    setIsLoading(true);
     try {
       const response = await fetch("http://127.0.0.1:5000/analyze", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ lyrics }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to analyze lyrics.");
-      }
+      if (!response.ok) throw new Error("Failed to analyze lyrics.");
 
       const data = await response.json();
       console.log("Analysis results:", data);
 
-      // Update state with API response
       setPredictedScore(data.popularity_score);
       setTopKeywords(data.top_keywords);
       setSentimentScore(data.sentiment_score);
       setSimilarSongs(
         data.similar_songs.map((song: any, index: number) => ({
           ...song,
-          image: `/song${index + 1}.jpg`, // Replace with actual image paths if available
+          image: `/song${index + 1}.jpg`,
         }))
       );
       setRecommendations(Array.isArray(data.recommendations) ? data.recommendations : []);
@@ -53,21 +49,32 @@ export default function Home() {
       console.error("Error:", error);
       alert("An error occurred while analyzing the lyrics. Please try again.");
     } finally {
-      setIsLoading(false); // Hide loading state
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="relative flex flex-col items-center min-h-screen bg-gray-900 text-white px-4">
       <Navbar />
-
       <WavyBackground />
 
-      {/* Lyrics Input Box at the Top */}
+      {/* Typewriter Effect Heading */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10 mt-20">
-        <h1 className="text-6xl font-bold tracking-wide">Rockstar Predictor 🎸</h1>
-        <p className="text-xl text-gray-300 mt-4">Paste your lyrics and predict their popularity!</p>
+        <TypewriterEffectSmooth
+          words={[
+            { text: "Write", className: "text-white" },
+            { text: "the", className: "text-white" },
+            { text: "next", className: "text-white" },
+            { text: "viral", className: "text-white" },
+            { text: "song", className: "text-white" },
+            { text: "with", className: "text-white" },
+            { text: "Hit The Charts", className: "text-blue-500" },
+          ]}
+          
+        />
+        <p className="text-xl text-white mt-4">Paste your lyrics and predict their popularity!</p>
 
+        {/* Lyrics Input */}
         <div className="mt-8 w-full max-w-2xl">
           <textarea
             className="w-full h-40 p-4 text-black rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500"
@@ -78,12 +85,15 @@ export default function Home() {
         </div>
 
         <button
-          onClick={handleSubmit}
-          className="mt-4 bg-blue-600 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300"
-          disabled={isLoading}
-        >
-          {isLoading ? "Analyzing..." : "Analyze Lyrics"}
-        </button>
+  onClick={handleSubmit}
+  disabled={isLoading}
+  className="relative inline-flex items-center justify-center p-0.5 mb-2 overflow-hidden text-sm font-medium text-white rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
+>
+  <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-black dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
+    {isLoading ? "Analyzing..." : "Analyze Lyrics"}
+  </span>
+</button>
+
       </div>
 
       {/* Results Popup */}
@@ -134,20 +144,19 @@ export default function Home() {
               <h3 className="text-xl font-semibold mb-3">Similar Songs</h3>
               <div className="grid grid-cols-3 gap-4">
                 {similarSongs.map((song, index) => (
-                <div key={index} className="bg-gray-700 p-4 rounded-lg shadow-lg text-center">
-                  <img
-                  src={song.image_url || "/default-image.jpg"}  // Use the image_url from the backend, or a default if not available
-                  alt={song.title}
-                  className="w-full h-32 object-cover rounded-md mb-2"
-                  />
-                  <h4 className="text-lg font-bold">{song.title}</h4>
-                  <p className="text-gray-400">{song.artist}</p>
-                  <p className="text-gray-300 text-sm mt-1">Themes: {song.themes.join(", ")}</p>
-                </div>
+                  <div key={index} className="bg-gray-700 p-4 rounded-lg shadow-lg text-center">
+                    <img
+                      src={song.image_url || "/default-image.jpg"}
+                      alt={song.title}
+                      className="w-full h-32 object-cover rounded-md mb-2"
+                    />
+                    <h4 className="text-lg font-bold">{song.title}</h4>
+                    <p className="text-gray-400">{song.artist}</p>
+                    <p className="text-gray-300 text-sm mt-1">Themes: {song.themes.join(", ")}</p>
+                  </div>
                 ))}
               </div>
             </div>
-
 
             {/* Recommendations */}
             <div>

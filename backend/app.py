@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from routes.songs import get_top_songs  # Import the route for top songs
 
 app = Flask(__name__)
 CORS(app)  # Allow frontend to communicate with backend
@@ -7,6 +8,9 @@ CORS(app)  # Allow frontend to communicate with backend
 @app.route("/")
 def home():
     return jsonify({"message": "Flask backend is running!"})
+
+# Add the route to fetch top songs
+app.add_url_rule('/get_top_songs', 'get_top_songs', get_top_songs)
 
 @app.route("/analyze", methods=["POST"])
 def analyze():

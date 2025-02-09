@@ -58,20 +58,21 @@ def analyze_sentiment(lyrics):
     sentiment = sia.polarity_scores(lyrics)
     return sentiment['compound']
 
-# Theme extraction and popularity prediction logic
 @app.route('/predict-popularityP', methods=['POST'])
 def predict_popularityP():
     data = request.json
     themes = data['themes']
     sentiment = data['sentiment']
     keywords = data['keywords']
+    tempo = data['tempo']
+    energy = data['energy']
 
     # Generate theme string and sentiment adjustment
     theme_string = " ".join([theme.lower().strip() for theme in themes])  # Normalize
     theme_embedding = model.encode([theme_string])
 
     # Fetch songs from MongoDB
-    songs = list(collection.find({"themes": {"$exists": True, "$ne": []}}, {"themes": 1, "popularity": 1}))
+    songs = list(collection.find({"themes": {"$exists": True, "$ne": []}}, {"themes": 1, "popularity": 1, "sentiment": 1, "tempo": 1, "energy": 1}))
     
     if not songs:
         return jsonify({"popularityScore": 50})  # Fallback if no songs are found
@@ -80,13 +81,43 @@ def predict_popularityP():
     song_embeddings = model.encode([" ".join(song["themes"]).lower() for song in songs])
     similarities = cosine_similarity(theme_embedding, song_embeddings)[0]
     
-    # Top 5 most similar songs based on themes
-    top_indices = [i for i in similarities.argsort()[::-1] if similarities[i] > 0.1][:5]  # Only consider high similarity
+    # Initialize variables for comparing sentiment, tempo, and energy
+    sentiment_similarities = []
+    tempo_similarities = []
+    energy_similarities = []
+    
+    # Compare sentiment, tempo, and energy
+    for song in songs:
+        sentiment_diff = abs(sentiment - song.get("sentiment", 0))
+        tempo_diff = abs(tempo - song.get("tempo", 0))
+        energy_diff = abs(energy - song.get("energy", 0))
+
+        sentiment_similarities.append(1 - sentiment_diff)  # Closer to 1 means more similar
+        tempo_similarities.append(1 - tempo_diff / 100)  # Normalize tempo difference, assuming range of 0-100
+        energy_similarities.append(1 - energy_diff)  # Normalize energy difference (0-1 scale)
+
+    # Compute final scores
+    final_scores = []
+    for i in range(len(songs)):
+        theme_score = similarities[i]
+        sentiment_score = sentiment_similarities[i]
+        tempo_score = tempo_similarities[i]
+        energy_score = energy_similarities[i]
+        
+        # Weight the factors (you can adjust these weights based on testing or domain knowledge)
+        final_score = (theme_score * 0.4) + (sentiment_score * 0.2) + (tempo_score * 0.2) + (energy_score * 0.2)
+        final_scores.append((i, final_score))
+
+    # Sort by final score and get the top 5 songs
+    final_scores.sort(key=lambda x: x[1], reverse=True)
+    top_indices = [x[0] for x in final_scores[:5]]
+
+    # Get the popularity scores of the top songs
     popularity_scores = [songs[i].get("popularity", 0) for i in top_indices if songs[i].get("popularity", 0) > 0]
     
     # Compute and return the average popularity score
     popularity_score = np.mean(popularity_scores) if popularity_scores else 50
-    return jsonify({"popularityScore": popularity_score})
+    return jsonify({"popularityScore": popularity_score - 10})
 
 def predict_popularity(themes, model, collection):
     theme_string = " ".join([theme.lower().strip() for theme in themes])  # Normalize

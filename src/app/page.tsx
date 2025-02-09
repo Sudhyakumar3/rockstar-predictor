@@ -165,51 +165,47 @@ export default function Home() {
             </div>
 
             {/* Similar Songs */}
-            <div className="mb-6 text-center">
-              <h3 className="text-xl font-semibold mb-3">Similar Songs</h3>
-              <div className="grid grid-cols-3 gap-4">
-                {similarSongs.map((song, index) => (
-                  <div key={index} className="bg-gray-700 p-4 rounded-lg shadow-lg text-center">
-                    <img
-                      src={song.image_url || "/default-image.jpg"}
-                      alt={song.title}
-                      className="w-full h-32 object-cover rounded-md mb-2"
-                    />
-                    <h4 className="text-lg font-bold">{song.title}</h4>
-                    <p className="text-gray-400">{song.artist}</p>
-                    <p className="text-gray-300 text-sm mt-1">Themes: {song.themes.join(", ")}</p>
-                  </div>
-                  <div key={index} className="bg-gray-700 p-4 rounded-lg shadow-lg text-center">
-                    <img
-                      src={song.image_url || "/default-image.jpg"}
-                      alt={song.title}
-                      className="w-full h-32 object-cover rounded-md mb-2"
-                    />
-                    <h4 className="text-lg font-bold">{song.title}</h4>
-                    <p className="text-gray-400">{song.artist}</p>
-                    <p className="text-gray-300 text-sm mt-1">Themes: {song.themes.join(", ")}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+<div className="mb-6 text-center">
+  <h3 className="text-xl font-semibold mb-3">Similar Songs</h3>
+  <div className="grid grid-cols-3 gap-4">
+    {similarSongs.map((song, index) => (
+      <div key={index} className="bg-gray-700 p-4 rounded-lg shadow-lg text-center">
+        <img
+          src={song.image_url || "/default-image.jpg"}
+          alt={song.title}
+          className="w-full h-32 object-cover rounded-md mb-2"
+        />
+        <h4 className="text-lg font-bold">{song.title}</h4>
+        <p className="text-gray-400">{song.artist}</p>
+        <p className="text-gray-300 text-sm mt-1">Themes: {song.themes.join(", ")}</p>
+      </div>
+    ))}
+  </div>
+</div>
+
 
             {/* Recommendations */}
-            <div className="text-center">
-              <h3 className="text-xl font-semibold mb-4">Recommendations</h3>
-              <div className="bg-gray-800 p-5 rounded-lg shadow-lg inline-block text-left max-w-3xl mx-auto">
-                {/* Extract the first line only if it's not a recommendation */}
-                <p className="text-gray-300 mb-3">
-                  {recommendations[0].includes("Here are some suggestions") ? recommendations[0] : "Here are some suggestions to improve the song:"}
-                </p>
-                <ul className="list-disc list-inside text-gray-300 space-y-3">
-                  {recommendations.slice(1).map((rec, index) => (
-                    <li key={index} className="leading-relaxed">
-                      {rec.replace(/^\*\s*/, '')} {/* Removes the '*' at the start */}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+<div className="text-center">
+  <h3 className="text-xl font-semibold mb-4">Recommendations</h3>
+  {recommendations.length > 0 && (
+    <div className="bg-gray-800 p-5 rounded-lg shadow-lg inline-block text-left max-w-3xl mx-auto">
+      {/* Extract the first line only if it's not a recommendation */}
+      <p className="text-gray-300 mb-3">
+        {recommendations[0]?.includes("Here are some suggestions")
+          ? recommendations[0]
+          : "Here are some suggestions to improve the song:"}
+      </p>
+      <ul className="list-disc list-inside text-gray-300 space-y-3">
+        {recommendations.slice(1).map((rec, index) => (
+          <li key={index} className="leading-relaxed">
+            {rec.replace(/^\*\s*/, "")} {/* Removes '*' at the start */}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
+
 
 
 

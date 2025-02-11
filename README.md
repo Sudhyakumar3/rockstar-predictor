@@ -1,4 +1,4 @@
-#Hit the Charts
+Hit the Charts
 ## Inspiration  
 With the advent of short-form media and other new ways to share music, many new artists have gotten the chance to be in the spotlight. We were curious—are there patterns in trending songs, and can budding musicians leverage these patterns to become the next superstar?  
 
